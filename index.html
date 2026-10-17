@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Runway Digital | Your Aviation Logbook</title>
+
   <style>
     * { box-sizing: border-box; }
 
@@ -23,43 +24,151 @@
 
     header h1 { margin: 0; }
 
-    nav { margin-top: 16px; }
+    nav {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
 
     nav a {
       color: white;
       text-decoration: none;
-      margin-right: 20px;
     }
+
+    nav a:hover { text-decoration: underline; }
 
     .hero {
       text-align: center;
-      padding: 85px 20px;
+      padding: 65px 20px;
       background: white;
     }
 
-    .hero h2 { font-size: 38px; }
+    .hero h2 {
+      font-size: clamp(28px, 5vw, 42px);
+    }
 
     .hero p {
       font-size: 18px;
       line-height: 1.6;
     }
 
-    .button {
+    .button, button {
       display: inline-block;
-      background: #3D83B9;
+      background: #2879B5;
       color: white;
-      padding: 13px 24px;
+      padding: 12px 20px;
+      border: none;
       border-radius: 8px;
       text-decoration: none;
-      margin-top: 16px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:hover, .button:hover {
+      background: #185987;
     }
 
     section {
-      max-width: 800px;
+      max-width: 950px;
       margin: 28px auto;
       padding: 28px;
       background: white;
       border-radius: 12px;
+      width: calc(100% - 32px);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin: 22px 0;
+    }
+
+    .stat {
+      background: #E5EFF7;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      margin-top: 8px;
+      color: #185987;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #A9BED0;
+      border-radius: 7px;
+      font: inherit;
+      color: #142B4A;
+      background: white;
+    }
+
+    input:focus, textarea:focus {
+      outline: 2px solid #2879B5;
+      outline-offset: 1px;
+    }
+
+    textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    .form-actions { margin-top: 18px; }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 18px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 650px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #D7E2EC;
+      text-align: left;
+    }
+
+    th { background: #E5EFF7; }
+
+    .delete-button {
+      background: #A83232;
+      padding: 8px 12px;
+    }
+
+    .empty {
+      padding: 22px;
+      text-align: center;
+      background: #F3F7FB;
+      border-radius: 8px;
+    }
+
+    .notice {
+      font-size: 14px;
+      color: #52677B;
+      line-height: 1.6;
     }
 
     footer {
@@ -68,14 +177,23 @@
       background: #142B4A;
       color: white;
     }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      section { padding: 20px; }
+      .hero { padding: 45px 18px; }
+    }
   </style>
 </head>
+
 <body>
   <header>
     <h1>✈ RUNWAY DIGITAL</h1>
-    <nav>
+    <nav aria-label="Main navigation">
       <a href="#home">Home</a>
       <a href="#tracker">Runway Tracker</a>
+      <a href="#logbook">My Logbook</a>
       <a href="#about">About</a>
     </nav>
   </header>
@@ -83,26 +201,280 @@
   <main>
     <div class="hero" id="home">
       <h2>Your aviation. Your logbook.</h2>
-      <p>One place to record your aircraft sightings<br>
-      and keep track of your aviation journey.</p>
-      <a class="button" href="#tracker">Explore the tracker</a>
+      <p>
+        One place to record your aircraft sightings<br>
+        and keep track of your aviation journey.
+      </p>
+      <a class="button" href="#tracker">Record a sighting</a>
     </div>
 
     <section id="tracker">
-      <h2>✈ Runway Tracker</h2>
-      <p>Your personal aircraft-sighting tracker is coming soon.</p>
-      <p>Keep an eye out as we build your aviation logbook!</p>
+      <h2>✈ Record an aircraft sighting</h2>
+      <p>Add an aircraft to your personal spotting logbook.</p>
+
+      <form id="sighting-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="registration">Aircraft registration *</label>
+            <input id="registration" name="registration"
+              placeholder="e.g. G-ABCD" required maxlength="30">
+          </div>
+
+          <div class="field">
+            <label for="airline">Airline</label>
+            <input id="airline" name="airline"
+              placeholder="e.g. British Airways" maxlength="80">
+          </div>
+
+          <div class="field">
+            <label for="aircraft">Aircraft type</label>
+            <input id="aircraft" name="aircraft"
+              placeholder="e.g. Airbus A320" maxlength="80">
+          </div>
+
+          <div class="field">
+            <label for="airport">Airport *</label>
+            <input id="airport" name="airport"
+              placeholder="e.g. Glasgow Airport" required maxlength="100">
+          </div>
+
+          <div class="field">
+            <label for="date">Date spotted *</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+
+          <div class="field full">
+            <label for="notes">Notes (optional)</label>
+            <textarea id="notes" name="notes"
+              placeholder="Add details about your sighting..."
+              maxlength="1000"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">+ Save sighting</button>
+        </div>
+        <p id="form-message" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="logbook">
+      <h2>📖 My Aviation Logbook</h2>
+      <p>Your recorded aircraft sightings will appear here.</p>
+
+      <div class="stats">
+        <div class="stat">
+          Total sightings
+          <strong id="total-count">0</strong>
+        </div>
+        <div class="stat">
+          Different registrations
+          <strong id="registration-count">0</strong>
+        </div>
+        <div class="stat">
+          Airlines recorded
+          <strong id="airline-count">0</strong>
+        </div>
+      </div>
+
+      <div id="sightings-list">
+        <p class="empty">No sightings yet. Record your first aircraft above!</p>
+      </div>
     </section>
 
     <section id="about">
       <h2>About Runway Digital</h2>
-      <p>Runway Digital is an aviation project for plane enthusiasts
-      to record, organise and look back on their aircraft sightings.</p>
+      <p>
+        Runway Digital is an aviation project for plane spotters
+        and enthusiasts to record, organise and look back on
+        their aircraft sightings.
+      </p>
+      <p class="notice">
+        This is an early prototype. Sightings are stored in this
+        browser on this device, not in an online account.
+        Clearing this browser's site data may erase your logbook.
+        Do not use this version for sensitive information.
+      </p>
     </section>
   </main>
 
   <footer>
     Runway Digital · Your aviation. Your logbook.
   </footer>
+
+  <script>
+    const form = document.getElementById("sighting-form");
+    const list = document.getElementById("sightings-list");
+    const message = document.getElementById("form-message");
+
+    const STORAGE_KEY = "runwayDigitalSightings";
+    let sightings = [];
+
+    // Load saved records from this browser.
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+
+      if (Array.isArray(parsed)) {
+        sightings = parsed.filter(item =>
+          item &&
+          typeof item.id === "string" &&
+          typeof item.registration === "string" &&
+          typeof item.airport === "string" &&
+          typeof item.date === "string"
+        );
+      }
+    } catch (error) {
+      message.textContent =
+        "Saved records could not be loaded in this browser.";
+    }
+
+    function saveSightings() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(sightings)
+        );
+        return true;
+      } catch (error) {
+        message.textContent =
+          "Could not save. Your browser storage may be unavailable or full.";
+        return false;
+      }
+    }
+
+    function makeCell(value) {
+      const cell = document.createElement("td");
+      cell.textContent = value || "—";
+      return cell;
+    }
+
+    function renderSightings() {
+      document.getElementById("total-count").textContent =
+        sightings.length;
+
+      document.getElementById("registration-count").textContent =
+        new Set(
+          sightings.map(item => item.registration.toUpperCase())
+        ).size;
+
+      document.getElementById("airline-count").textContent =
+        new Set(
+          sightings.map(item => item.airline.trim().toLowerCase())
+            .filter(Boolean)
+        ).size;
+
+      list.replaceChildren();
+
+      if (sightings.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent =
+          "No sightings yet. Record your first aircraft above!";
+        list.appendChild(empty);
+        return;
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "table-wrap";
+
+      const table = document.createElement("table");
+      const head = document.createElement("thead");
+      const headingRow = document.createElement("tr");
+
+      [
+        "Registration", "Airline", "Aircraft",
+        "Airport", "Date", "Notes", "Action"
+      ].forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        headingRow.appendChild(th);
+      });
+
+      head.appendChild(headingRow);
+      table.appendChild(head);
+
+      const body = document.createElement("tbody");
+
+      sightings.forEach(item => {
+        const row = document.createElement("tr");
+
+        row.appendChild(makeCell(item.registration));
+        row.appendChild(makeCell(item.airline));
+        row.appendChild(makeCell(item.aircraft));
+        row.appendChild(makeCell(item.airport));
+        row.appendChild(makeCell(item.date));
+        row.appendChild(makeCell(item.notes));
+
+        const actionCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+
+        deleteButton.type = "button";
+        deleteButton.className = "delete-button";
+        deleteButton.textContent = "Delete";
+
+        deleteButton.addEventListener("click", () => {
+          if (!confirm("Delete this aircraft sighting?")) return;
+
+          const previous = sightings;
+          sightings = sightings.filter(s => s.id !== item.id);
+
+          if (saveSightings()) {
+            renderSightings();
+            message.textContent = "Sighting deleted.";
+          } else {
+            sightings = previous;
+          }
+        });
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+        body.appendChild(row);
+      });
+
+      table.appendChild(body);
+      wrapper.appendChild(table);
+      list.appendChild(wrapper);
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+
+      const data = new FormData(form);
+
+      const sighting = {
+        id: crypto.randomUUID(),
+        registration: String(data.get("registration")).trim(),
+        airline: String(data.get("airline")).trim(),
+        aircraft: String(data.get("aircraft")).trim(),
+        airport: String(data.get("airport")).trim(),
+        date: String(data.get("date")),
+        notes: String(data.get("notes")).trim()
+      };
+
+      if (
+        !sighting.registration ||
+        !sighting.airport ||
+        !sighting.date
+      ) {
+        message.textContent =
+          "Please complete all required fields.";
+        return;
+      }
+
+      sightings.unshift(sighting);
+
+      if (!saveSightings()) {
+        sightings.shift();
+        return;
+      }
+
+      renderSightings();
+      form.reset();
+      message.textContent = "Aircraft sighting saved successfully!";
+    });
+
+    renderSightings();
+  </script>
 </body>
 </html>
